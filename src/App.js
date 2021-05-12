@@ -1,65 +1,50 @@
-import { Component, Fragment } from 'react';
+import { Component } from 'react';
 import './App.css';
 
 class App extends Component {
   state = {
-    counter: 0,
-    posts: [
-      {
-        id: 1,
-        title: 'O título 1',
-        body: 'O corpo 1',
-      },
-      {
-        id: 2,
-        title: 'O título 2',
-        body: 'O corpo 2',
-      },
-      {
-        id: 3,
-        title: 'O título 3',
-        body: 'O corpo 3',
-      },
-    ]
+    posts: []
   };
 
-  timeoutUpdate = null;
   // utilizado na requisição de dados de API
   componentDidMount() { // executa após o componente ser montado 
-    this.handleTimeout();
+    this.loadPosts();
   }
 
-  componentDidUpdate() { // É chamado quando o componente é atualizado
-    this.handleTimeout();
-  }
+  loadPosts = async () => {
+    const postResponse = fetch('https://jsonplaceholder.typicode.com/posts');
+    const photosResponse = fetch('https://jsonplaceholder.typicode.com/photos');
 
-  componentWillUnmount() { // executa antes do componente ser desmontado
-    clearTimeout(this.timeoutUpdate); // Limpa o lixo deixado pelo Timeout
-  }
+    const [posts, photos] = await Promise.all([postResponse, photosResponse]);
 
-  handleTimeout = () => {
-    const { posts, counter } = this.state;
-    posts[0].title = 'O título mudou';
-    posts[1].title = 'O título mudou';
+    const postsJson = await posts.json();
+    const photosJson = await photos.json();
 
-    this.timeoutUpdate = setTimeout(() => {
-      this.setState({ posts, counter: counter + 1 });
-    }, 2000)
+    const postsAndPhotos = postsJson.map((post, index) => {
+      return { ...post, cover: photosJson[index].url }
+    })
+
+    this.setState({ posts: postsAndPhotos });
   }
 
   render() {
-    const { posts, counter } = this.state;
+    const { posts } = this.state;
 
     return (
-      <div className="App">
-        <h1>{counter}</h1>
-        {posts.map(post => (
-          <Fragment key={post.id}>
-            <h1 >{post.title}</h1>
-            <p>{post.body}</p>
-          </Fragment>
-        ))}
-      </div>
+      <section className="container">
+        <div className="posts">
+          {posts.map(post => (
+            <div className="post">
+              <img src={post.cover} alt={post.title} />
+              <div key={post.id} className="post-content">
+                <h1 >{post.title}</h1>
+                <p>{post.body}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
+
     );
   }
 }

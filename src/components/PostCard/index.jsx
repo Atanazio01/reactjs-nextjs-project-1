@@ -2,7 +2,6 @@ import P from 'prop-types';
 import './styles.css';
 
 export const PostCard = ({ id, title, body, cover }) => {
-  console.log();
   return (
     <div className="post">
       <img src={cover} alt={title} />

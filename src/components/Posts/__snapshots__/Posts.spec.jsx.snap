@@ -66,9 +66,3 @@ exports[`<Posts /> should macth snapshot 1`] = `
   </div>
 </div>
 `;
-
-exports[`<Posts /> should macth snapshot 2`] = `
-<div
-  class="posts"
-/>
-`;
